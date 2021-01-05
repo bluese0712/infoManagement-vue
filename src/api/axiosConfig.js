@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MessageBox } from 'element-ui';
+import { MessageBox, Message } from 'element-ui';
 import VueRouter from '../router';
 
 // axios.interceptors.request.use((config) => {
@@ -20,7 +20,7 @@ import VueRouter from '../router';
 //     return config;
 // });
 
-axios.interceptors.response.use((response) => {
+axios.interceptors.response.use(response => {
     if (response.data.code === 901) {
         localStorage.removeItem('loginToken');
         MessageBox.confirm('登录已失效，请重新登录', '提示', {
@@ -35,6 +35,13 @@ axios.interceptors.response.use((response) => {
         });
     }
     return response.data;
+}, error => {
+    if (error.meaasge || error) {
+        Message({
+            type: 'error',
+            message: error.meaasge ? error.meaasge : error
+        });
+    }
 });
 
 export default axios;

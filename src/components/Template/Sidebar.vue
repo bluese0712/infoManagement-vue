@@ -54,9 +54,23 @@ export default {
         };
     },
     mounted() {
-        this.menuItems = this.$router.options.routes[1].children;
+        this.menuItems = this.getShowRouter(this.$router.options.routes);
     },
     methods: {
+        getShowRouter(array) {
+            for (let i = 0; i < array.length; i++) {
+                if (array[i].hidden) {
+                    array.splice(i, 1);
+                    i--;
+                    continue;
+                }
+                if (array[i].children.length === 1 && !array[i].children[0].children) {
+                    array[i] = array[i].children[0];
+                    continue;
+                }
+            }
+            return array;
+        }
     }
 };
 </script>

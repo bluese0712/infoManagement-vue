@@ -6,9 +6,9 @@ import store from './store';
 import '@/assets/css/global.scss';
 
 import {
-// Pagination,
-// Dialog,
-// Autocomplete,
+    Pagination,
+    Dialog,
+    // Autocomplete,
     Dropdown,
     DropdownMenu,
     DropdownItem,
@@ -30,9 +30,9 @@ import {
     // OptionGroup,
     Button,
     // ButtonGroup,
-    // Table,
-    // TableColumn,
-    // DatePicker,
+    Table,
+    TableColumn,
+    DatePicker,
     // TimeSelect,
     // TimePicker,
     // Popover,
@@ -48,8 +48,8 @@ import {
     // Alert,
     // Slider,
     // Icon,
-    // Row,
-    // Col,
+    Row,
+    Col,
     // Upload,
     // Progress,
     // Spinner,
@@ -81,13 +81,13 @@ import {
     // CascaderPanel,
     // Loading,
     // MessageBox,
-    // Message,
+    Message,
     // Notification,
     scrollbar
 } from 'element-ui';
 
-// Vue.use(Pagination);
-// Vue.use(Dialog);
+Vue.use(Pagination);
+Vue.use(Dialog);
 // Vue.use(Autocomplete);
 Vue.use(Dropdown);
 Vue.use(DropdownMenu);
@@ -110,9 +110,9 @@ Vue.use(Checkbox);
 // Vue.use(OptionGroup);
 Vue.use(Button);
 // Vue.use(ButtonGroup);
-// Vue.use(Table);
-// Vue.use(TableColumn);
-// Vue.use(DatePicker);
+Vue.use(Table);
+Vue.use(TableColumn);
+Vue.use(DatePicker);
 // Vue.use(TimeSelect);
 // Vue.use(TimePicker);
 // Vue.use(Popover);
@@ -128,8 +128,8 @@ Vue.use(TabPane);
 // Vue.use(Alert);
 // Vue.use(Slider);
 // Vue.use(Icon);
-// Vue.use(Row);
-// Vue.use(Col);
+Vue.use(Row);
+Vue.use(Col);
 // Vue.use(Upload);
 // Vue.use(Progress);
 // Vue.use(Spinner);
@@ -169,7 +169,7 @@ Vue.use(scrollbar);
 // Vue.prototype.$confirm = MessageBox.confirm;
 // Vue.prototype.$prompt = MessageBox.prompt;
 // Vue.prototype.$notify = Notification;
-// Vue.prototype.$message = Message;
+Vue.prototype.$message = Message;
 
 Vue.config.productionTip = false;
 

@@ -1,0 +1,70 @@
+<template>
+    <el-dialog :title="type === 'add'?'添加记录': '修改记录'" :visible.sync="dialogVisible" width="600px">
+        <el-form ref="dialogForm" :model="dialogForm" size="mini" :rules="formRules" label-width="60px">
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="时间" prop="dissipate">
+                        <el-date-picker v-model="dialogForm.dissipate" type="datetime" placeholder="选择日期时间"></el-date-picker>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="金额" prop="amount">
+                        <el-input v-model="dialogForm.amount" @change="inputNumber"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <div class="text-right">
+                <el-button @click="dialogVisible = false" size="mini">取 消</el-button>
+                <el-button type="primary" @click="createConfirm" size="mini">确 定</el-button>
+            </div>
+        </el-form>
+
+    </el-dialog>
+</template>
+
+<script>
+export default {
+    name: 'cwrecordedit',
+    props: {
+        parameter: { type: Object }
+    },
+    watch: {
+        parameter(val) {
+            this.type = val.type;
+            this.dialogVisible = true;
+            console.log(val);
+        }
+    },
+    data() {
+        return {
+            type: '',
+            dialogVisible: false,
+            dialogForm: {
+                dissipate: new Date(),
+                amount: null
+            },
+            formRules: {
+                dissipate: [{ required: true, message: '请选择消费时间', trigger: 'blur' }],
+                amount: [{ required: true, message: '请填写消费金额', trigger: 'blur' }]
+            }
+        };
+    },
+    methods: {
+        inputNumber() {
+            this.dialogForm.amount = this.dialogForm.amount.replace(/[^\d.]/g, '');
+            this.dialogForm.amount = this.dialogForm.amount ? parseFloat(this.dialogForm.amount).toString() : '';
+        },
+        createConfirm() {
+            this.$refs.dialogForm.validate((valid) => {
+                if (!valid) {
+                    return;
+                }
+                this.createCWRecord();
+            });
+        },
+        async createCWRecord() {
+
+        }
+    }
+};
+</script>
