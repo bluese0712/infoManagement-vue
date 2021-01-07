@@ -4,7 +4,7 @@
             <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="menuCollapse" active-text-color="rgb(64, 158, 255)" router>
                 <template v-for="item in menuItems">
                     <template v-if="item.children && item.children.length">
-                        <el-submenu :index="item.path" :key="item.path">
+                        <el-submenu :index="item.title" :key="item.title">
                             <template slot="title"><i :class="item.icon"></i><span slot="title">{{ item.title }}</span></template>
                             <template v-for="secondItem in item.children">
                                 <el-submenu v-if="secondItem.children && secondItem.children.length" :index="secondItem.url" :key="secondItem.url">
@@ -64,7 +64,7 @@ export default {
                     i--;
                     continue;
                 }
-                if (array[i].children.length === 1 && !array[i].children[0].children) {
+                if (!array[i].title && array[i].children.length === 1 && !array[i].children[0].children) {
                     array[i] = array[i].children[0];
                     continue;
                 }

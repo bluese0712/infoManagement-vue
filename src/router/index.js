@@ -5,6 +5,12 @@ import Template from '../components/Template/Template.vue';
 import Index from '../views/Index.vue';
 import CWCategory from '../views/finance/CWCategory.vue';
 import CWRecord from '../views/finance/CWRecord.vue';
+import CWtotalAssets from '../views/finance/CWtotalAssets.vue';
+import CWFund from '../views/finance/CWFund.vue';
+import CWMonthlySummary from '../views/finance/CWMonthlySummary.vue';
+import CWQuarterlySummary from '../views/finance/CWQuarterlySummary.vue';
+import CWAnnualSummary from '../views/finance/CWAnnualSummary.vue';
+
 import JSRecord from '../views/bodybuilding/JSRecord.vue';
 Vue.use(VueRouter);
 
@@ -33,6 +39,18 @@ const routes = [
         component: Template,
         children: [
             {
+                path: '/cwtotalAssets',
+                name: 'cwtotalAssets',
+                title: '总资产',
+                component: CWtotalAssets
+            },
+            {
+                path: '/cwfund',
+                name: 'cwfund',
+                title: '理财基金',
+                component: CWFund
+            },
+            {
                 path: '/cwcategory',
                 name: 'cwcategory',
                 title: '收支项',
@@ -44,6 +62,31 @@ const routes = [
                 title: '收支记录',
                 component: CWRecord
             },
+            {
+                path: '/cwmonthlySummary',
+                name: 'cwmonthlySummary',
+                title: '月度总结',
+                component: CWMonthlySummary
+            },
+            {
+                path: '/cwquarterlySummary',
+                name: 'cwquarterlySummary',
+                title: '季度总结',
+                component: CWQuarterlySummary
+            },
+            {
+                path: '/cwannualSummary',
+                name: 'cwannualSummary',
+                title: '年度总结',
+                component: CWAnnualSummary
+            }
+        ]
+    },
+    {
+        path: '/',
+        title: '健身管理',
+        component: Template,
+        children: [
             {
                 path: '/jsrecord',
                 name: 'jsrecord',
