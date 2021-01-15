@@ -25,8 +25,8 @@ import {
     // CheckboxButton,
     // CheckboxGroup,
     // Switch,
-    // Select,
-    // Option,
+    Select,
+    Option,
     // OptionGroup,
     Button,
     // ButtonGroup,
@@ -73,13 +73,13 @@ import {
     // Timeline,
     // TimelineItem,
     // Link,
-    // Divider,
+    Divider,
     // Image,
     // Calendar,
     Backtop,
     // PageHeader,
     // CascaderPanel,
-    // Loading,
+    Loading,
     // MessageBox,
     Message,
     // Notification,
@@ -105,8 +105,8 @@ Vue.use(Checkbox);
 // Vue.use(CheckboxButton);
 // Vue.use(CheckboxGroup);
 // Vue.use(Switch);
-// Vue.use(Select);
-// Vue.use(Option);
+Vue.use(Select);
+Vue.use(Option);
 // Vue.use(OptionGroup);
 Vue.use(Button);
 // Vue.use(ButtonGroup);
@@ -153,17 +153,17 @@ Vue.use(Col);
 // Vue.use(Timeline);
 // Vue.use(TimelineItem);
 // Vue.use(Link);
-// Vue.use(Divider);
+Vue.use(Divider);
 // Vue.use(Image);
 // Vue.use(Calendar);
 Vue.use(Backtop);
 // Vue.use(PageHeader);
 // Vue.use(CascaderPanel);
 
-// Vue.use(Loading.directive);
+Vue.use(Loading.directive);
 Vue.use(scrollbar);
 
-// Vue.prototype.$loading = Loading.service;
+Vue.prototype.$loading = Loading.service;
 // Vue.prototype.$msgbox = MessageBox;
 // Vue.prototype.$alert = MessageBox.alert;
 // Vue.prototype.$confirm = MessageBox.confirm;
