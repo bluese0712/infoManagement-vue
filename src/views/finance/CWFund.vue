@@ -51,7 +51,7 @@ export default {
     },
     methods: {
         async getUserFundListByParams() {
-            const res = await api.cwRecord.getRecordListByParams();
+            const res = await api.cwFund.updateFund();
             if (res.code !== 200) {
                 this.$message({ type: 'error', message: res.msg });
                 return;

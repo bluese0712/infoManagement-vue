@@ -5,11 +5,11 @@
             <el-form ref="dialogForm" :model="dialogForm" size="small" :rules="formRules" label-width="90px" v-loading="createLoading">
                 <el-row>
                     <el-col :span="24">
-                        <el-form-item label="基金" prop="fundCode">
-                            <el-select v-model="dialogForm.fundCode" placeholder="请填写基金代码，名称或简称" filterable clearable :filter-method="fundFilter" class="w-100">
-                                <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
-                                    <span style="float: left">{{ item.label }}</span>
-                                    <span style="float: right;color: #8492a6; font-size: 13px">{{ item.code }}</span>
+                        <el-form-item label="基金" prop="fundID">
+                            <el-select v-model="dialogForm.fundID" placeholder="请填写基金代码，名称或简称" filterable clearable :filter-method="fundFilter" class="w-100">
+                                <el-option v-for="item in options" :key="item.fundID" :label="item.fundName" :value="item.fundID">
+                                    <span style="float: left">{{ item.fundName }}</span>
+                                    <span style="float: right;color: #8492a6; font-size: 13px">{{ item.fundCode }}</span>
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -42,7 +42,7 @@
                             </el-col>
                         </el-row>
                     </el-col>
-                    <el-col :span="24" class="py-10" v-if="!rateForm.isEnd" >
+                    <el-col :span="24" class="py-10" v-if="!rateForm.isEnd">
                         <el-row>
                             <el-col :span="4" class="minDays">
                                 <el-input v-model="rateForm.minDays" class="text-right" size="mini" :disabled="true"></el-input>
@@ -78,17 +78,17 @@
         <el-dialog title="信息确认" :visible.sync="confirmDialogVisible" width="500px">
             <el-row>
                 <el-col :span="4">基金名称：</el-col>
-                <el-col :span="20">易方达蓝筹精选混合</el-col>
+                <el-col :span="20" v-html="confirmForm.fundName"></el-col>
                 <el-col :span="4">基金代码：</el-col>
-                <el-col :span="20">005827</el-col>
+                <el-col :span="20" v-html="confirmForm.fundCode"></el-col>
                 <el-col :span="4">购时净值：</el-col>
-                <el-col :span="20">2.7045</el-col>
+                <el-col :span="20" v-html="confirmForm.netWorth"></el-col>
                 <el-col :span="4">购买份额：</el-col>
-                <el-col :span="20">27.56</el-col>
+                <el-col :span="20" v-html="confirmForm.share"></el-col>
                 <el-col :span="4">购买时间：</el-col>
-                <el-col :span="20">2021-01-12</el-col>
+                <el-col :span="20" v-html="confirmForm.purchaseTime"></el-col>
                 <el-col :span="4">购买金额：</el-col>
-                <el-col :span="20">1997</el-col>
+                <el-col :span="20" v-html="confirmForm.purchaseAmount"></el-col>
                 <el-col :span="24">
                     <el-divider content-position="left" style="margin: 12px 0;color: red">赎回费率</el-divider>
                 </el-col>
@@ -108,6 +108,7 @@
 </template>
 
 <script>
+import api from '@/api';
 export default {
     name: 'cwrecordedit',
     props: {
@@ -117,7 +118,6 @@ export default {
         parameter(val) {
             this.type = val.type;
             this.dialogVisible = true;
-            console.log(val);
         }
     },
     data() {
@@ -128,12 +128,21 @@ export default {
             createLoading: false,
             confirmLoading: false,
             dialogForm: {
-                fundCode: '',
+                fundID: '',
                 confirmationTime: '',
                 shares: ''
             },
+            confirmForm: {
+                fundID: '',
+                fundName: '',
+                fundCode: '',
+                netWorth: '',
+                share: '',
+                purchaseTime: '',
+                purchaseAmount: ''
+            },
             formRules: {
-                fundCode: [{ required: true, message: '请选择基金', trigger: 'blur' }],
+                fundID: [{ required: true, message: '请选择基金', trigger: 'blur' }],
                 confirmationTime: [{ required: true, message: '请选择确购时间', trigger: 'blur' }],
                 shares: [{ required: true, message: '请填写购买份额', trigger: 'blur' }]
             },
@@ -144,56 +153,8 @@ export default {
                 isEnd: false
             },
             rateArray: [],
-            options: [{
-                value: 'Beijing',
-                code: '001245',
-                label: '北京'
-            }, {
-                value: 'Shanghai',
-                code: '001245',
-                label: '上海'
-            }, {
-                value: 'Nanjing',
-                code: '001245',
-                label: '南京'
-            }, {
-                value: 'Chengdu',
-                code: '001245',
-                label: '成都'
-            }, {
-                value: 'Shenzhen',
-                code: '001245',
-                label: '深圳'
-            }, {
-                value: 'Guangzhou',
-                code: '004764',
-                label: '广州'
-            }],
-            allOptions: [{
-                value: 'Beijing',
-                code: '001245',
-                label: '北京'
-            }, {
-                value: 'Shanghai',
-                code: '001245',
-                label: '上海'
-            }, {
-                value: 'Nanjing',
-                code: '001245',
-                label: '南京'
-            }, {
-                value: 'Chengdu',
-                code: '001245',
-                label: '成都'
-            }, {
-                value: 'Shenzhen',
-                code: '001245',
-                label: '深圳'
-            }, {
-                value: 'Guangzhou',
-                code: '004764',
-                label: '广州'
-            }]
+            options: [],
+            timer: null
         };
     },
     methods: {
@@ -281,21 +242,45 @@ export default {
         },
         async getFundEquityByFundCode() {
             this.createLoading = true;
+            const res = await api.cwFund.getFundEquityByFundCode(this.dialogForm.fundID, '2021-01-14 12:01:11');
+            this.createLoading = false;
+            if (res.code !== 200) {
+                this.$message({ type: 'error', message: res.msg });
+                return;
+            }
+            this.confirmForm.fundID = this.dialogForm.fundID;
+            for (const fund of this.options) {
+                if (fund.fundID === this.dialogForm.fundID) {
+                    this.confirmForm.fundName = fund.fundName;
+                    this.confirmForm.fundCode = fund.fundCode;
+                }
+            }
+            console.log(res);
             this.confirmDialogVisible = true;
         },
         async createCWRecord() {
 
         },
+        // 基金赛选
         fundFilter(val) {
             if (val) { // val存在
-                this.options = this.allOptions.filter((item) => {
-                    if (!!~item.label.indexOf(val) || !!~item.code.indexOf(val)) {
-                        return true;
-                    }
-                });
+                window.clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
+                    this.getFundListByParams(val);
+                }, 300);
             } else { // val为空时，还原数组
-                this.options = this.optionsCopy;
+                this.options = [];
+                window.clearTimeout(this.timer);
             }
+        },
+        // 根据字段的模糊搜索基金
+        async getFundListByParams(val) {
+            const res = await api.cwFund.getFundListByParams(val.toUpperCase());
+            if (res.code !== 200) {
+                this.$message({ type: 'error', message: res.msg });
+                return;
+            }
+            this.options = res.data;
         }
     }
 };

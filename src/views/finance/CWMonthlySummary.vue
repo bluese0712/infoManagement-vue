@@ -1,56 +1,65 @@
 <template>
     <div class="table-content">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="一月" name="first">用户管理</el-tab-pane>
-            <el-tab-pane label="二月" name="second">配置管理</el-tab-pane>
-            <el-tab-pane label="三月" name="third">角色管理</el-tab-pane>
-            <el-tab-pane label="四月" name="fourth">定时任务补偿</el-tab-pane>
-            <el-tab-pane label="五月" name="first">用户管理</el-tab-pane>
-            <el-tab-pane label="六月" name="second">配置管理</el-tab-pane>
-            <el-tab-pane label="七月" name="third">角色管理</el-tab-pane>
-            <el-tab-pane label="八月" name="fourth">定时任务补偿</el-tab-pane>
-            <el-tab-pane label="九月" name="first">用户管理</el-tab-pane>
-            <el-tab-pane label="十月" name="second">配置管理</el-tab-pane>
-            <el-tab-pane label="十一月" name="third">角色管理</el-tab-pane>
-            <el-tab-pane label="十二月" name="fourth">定时任务补偿</el-tab-pane>
-            <div>
-                 # 获取基金列表
-    # res = requests.get('http://fund.eastmoney.com/js/fundcode_search.js')
-    # content = re.findall('var r = (.*])', res.text)[0]
-    # array = json.loads(content)
-    # ['基金代码', '基金名称缩写', '基金名称', '基金类型', '基金名称拼音']
-
-    # 获取非货币基金数据
-    # res = requests.get('http://fundgz.1234567.com.cn/js/005827.js?rt=1463558676006')
-    # content = re.findall('jsonpgz[(](.*})', res.text)[0]
-    # data = json.loads(content)
-    # {"fundcode": "基金代码", "name": "基金名称", "jzrq": "上次结算日期", "dwjz": "结算净值",
-    #  "gsz": "当前净值", "gszzl": "当前涨幅", "gztime": "当前日期"}
-
-    # 获取基金数据
-    fundCode = '004972'
-    url = 'http://api.fund.eastmoney.com/f10/lsjz'
-
-    # 参数化访问链接，以dict方式存储
-    params = {
-        'callback': 'jQuery18302183990854851532_1610004838519',
-        'fundCode': fundCode,
-        'pageIndex': 1,
-        'pageSize': 40,
-    }
-    # 装饰头文件
-    headers = {
-        'Host': 'api.fund.eastmoney.com',
-        'Referer': 'http://fundf10.eastmoney.com/jjjz_%s.html' % fundCode,
-    }
-    res = requests.get(url=url, headers=headers, params=params)  # 发送请求
-    content = re.findall('jQuery18302183990854851532_1610004838519[(](.*})', res.text)[0]
-    data = json.loads(content)
-    print(data)
-    # content = re.findall('var r = (.*])', res.text)[0]
-    # array = json.loads(content)
+        <div class="table-box">
+            <div class="d-flex">
+                <div>
+                    <el-dropdown>
+                        <span class="el-dropdown-link">
+                            下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item>黄金糕</el-dropdown-item>
+                            <el-dropdown-item>狮子头</el-dropdown-item>
+                            <el-dropdown-item>螺蛳粉</el-dropdown-item>
+                            <el-dropdown-item disabled>双皮奶</el-dropdown-item>
+                            <el-dropdown-item divided>蚵仔煎</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </div>
+                <div class="flex-1">
+                    <el-tabs v-model="activeName" class="mx-10" :stretch="true" @tab-click="monthSelect">
+                        <el-tab-pane label="一月" name="January"></el-tab-pane>
+                        <el-tab-pane label="二月" name="February"></el-tab-pane>
+                        <el-tab-pane label="三月" name="March"></el-tab-pane>
+                        <el-tab-pane label="四月" name="April"></el-tab-pane>
+                        <el-tab-pane label="五月" name="May"></el-tab-pane>
+                        <el-tab-pane label="六月" name="June"></el-tab-pane>
+                        <el-tab-pane label="七月" name="July"></el-tab-pane>
+                        <el-tab-pane label="八月" name="August"></el-tab-pane>
+                        <el-tab-pane label="九月" name="September"></el-tab-pane>
+                        <el-tab-pane label="十月" name="October"></el-tab-pane>
+                        <el-tab-pane label="十一月" name="November"></el-tab-pane>
+                        <el-tab-pane label="十二月" name="December"></el-tab-pane>
+                    </el-tabs>
+                </div>
             </div>
-        </el-tabs>
+
+            <!-- <div>
+                <el-timeline>
+    <el-timeline-item timestamp="2018/4/12" placement="top">
+      <el-card>
+        <h4>更新 Github 模板</h4>
+        <p>王小虎 提交于 2018/4/12 20:46</p>
+      </el-card>
+    </el-timeline-item>
+    <el-timeline-item timestamp="2018/4/3" placement="top">
+      <el-card>
+        <h4>更新 Github 模板</h4>
+        <p>王小虎 提交于 2018/4/3 20:46</p>
+      </el-card>
+    </el-timeline-item>
+    <el-timeline-item timestamp="2018/4/2" placement="top">
+      <el-card>
+        <h4>更新 Github 模板</h4>
+        <p>王小虎 提交于 2018/4/2 20:46</p>
+      </el-card>
+    </el-timeline-item>
+  </el-timeline>
+            </div> -->
+            <div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -61,11 +70,24 @@ export default {
     name: 'cwquarterlySummary',
     data() {
         return {
+            activeName: ''
         };
     },
     mounted() {
     },
     methods: {
+        monthSelect(val) {
+            console.log(this.activeName);
+        }
     }
 };
 </script>
+<style lang="scss" scoped>
+.el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
+</style>
