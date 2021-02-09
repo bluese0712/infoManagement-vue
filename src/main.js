@@ -23,7 +23,7 @@ import {
     // RadioButton,
     Checkbox,
     // CheckboxButton,
-    // CheckboxGroup,
+    CheckboxGroup,
     // Switch,
     Select,
     Option,
@@ -43,7 +43,7 @@ import {
     FormItem,
     Tabs,
     TabPane,
-    // Tag,
+    Tag,
     // Tree,
     // Alert,
     // Slider,
@@ -60,8 +60,8 @@ import {
     // Step,
     // Carousel,
     // CarouselItem,
-    // Collapse,
-    // CollapseItem,
+    Collapse,
+    CollapseItem,
     // Cascader,
     // ColorPicker,
     // Transfer,
@@ -80,7 +80,7 @@ import {
     // PageHeader,
     // CascaderPanel,
     Loading,
-    // MessageBox,
+    MessageBox,
     Message,
     // Notification,
     scrollbar
@@ -103,7 +103,7 @@ Vue.use(Input);
 // Vue.use(RadioButton);
 Vue.use(Checkbox);
 // Vue.use(CheckboxButton);
-// Vue.use(CheckboxGroup);
+Vue.use(CheckboxGroup);
 // Vue.use(Switch);
 Vue.use(Select);
 Vue.use(Option);
@@ -123,7 +123,7 @@ Vue.use(Form);
 Vue.use(FormItem);
 Vue.use(Tabs);
 Vue.use(TabPane);
-// Vue.use(Tag);
+Vue.use(Tag);
 // Vue.use(Tree);
 // Vue.use(Alert);
 // Vue.use(Slider);
@@ -140,8 +140,8 @@ Vue.use(Col);
 // Vue.use(Step);
 // Vue.use(Carousel);
 // Vue.use(CarouselItem);
-// Vue.use(Collapse);
-// Vue.use(CollapseItem);
+Vue.use(Collapse);
+Vue.use(CollapseItem);
 // Vue.use(Cascader);
 // Vue.use(ColorPicker);
 // Vue.use(Transfer);
@@ -164,10 +164,10 @@ Vue.use(Loading.directive);
 Vue.use(scrollbar);
 
 Vue.prototype.$loading = Loading.service;
-// Vue.prototype.$msgbox = MessageBox;
+Vue.prototype.$msgbox = MessageBox;
 // Vue.prototype.$alert = MessageBox.alert;
-// Vue.prototype.$confirm = MessageBox.confirm;
-// Vue.prototype.$prompt = MessageBox.prompt;
+Vue.prototype.$confirm = MessageBox.confirm;
+Vue.prototype.$prompt = MessageBox.prompt;
 // Vue.prototype.$notify = Notification;
 Vue.prototype.$message = Message;
 

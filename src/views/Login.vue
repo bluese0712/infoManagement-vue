@@ -15,7 +15,7 @@
                     <el-checkbox v-model="savePassword" label="保存密码" name="type" style="color:#fff"></el-checkbox>
                 </div>
                 <el-form-item>
-                    <el-button type="primary" native-type=“submit” @click="loginSubmit" style="width:100%">登录</el-button>
+                    <el-button type="primary" native-type=“submit” @click="loginSubmit" :loading="loading" style="width:100%">登录</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -23,16 +23,20 @@
 </template>
 
 <script>
+import api from '@/api';
+import { timestampToTemp } from '@/assets/js/method';
+import JSEncrypt from 'jsencrypt';
 export default {
     name: 'Login',
     data() {
         return {
             loginForm: {
-                userName: '',
-                password: ''
+                userName: localStorage.getItem('BLUE_FEATHER_SAVEPWD') ? localStorage.getItem('BLUE_FEATHER_USERNAME') : '',
+                password: localStorage.getItem('BLUE_FEATHER_SAVEPWD') ? localStorage.getItem('BLUE_FEATHER_PASSWORD') : ''
             },
-            savePassword: false,
+            savePassword: !!localStorage.getItem('BLUE_FEATHER_SAVEPWD'),
             passwordType: false,
+            loading: false,
             formRules: {
                 userName: [{ required: true, message: '请输入账号', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
@@ -41,16 +45,55 @@ export default {
     },
     methods: {
         loginSubmit() {
-            this.$router.push('/index');
             this.$refs.loginForm.validate((valid) => {
                 if (!valid) {
                     return;
                 }
-                this.login();
+                this.loading = true;
+                this.judgeHasPublicKey();
             });
         },
-        async login() {
-            // const res = await api.common.login();
+        // 判断是否存在可用公钥
+        judgeHasPublicKey() {
+            let time = localStorage.getItem('putlicKeyGetTime');
+            if (time && timestampToTemp(time, '%Y-%M-%D') === timestampToTemp(new Date(), '%Y-%M-%D')) {
+                let publicKey = localStorage.getItem('publicKey');
+                this.loadingSubmit(this.encryptionPwd(publicKey));
+                return;
+            }
+            this.getRSAPublicKey();
+        },
+        // 加密
+        encryptionPwd(pubKey) {
+            let encryptStr = new JSEncrypt();
+            encryptStr.setPublicKey(pubKey); // 设置 加密公钥
+            let data = encryptStr.encrypt(JSON.stringify({ password: this.loginForm.password, encryptionTime: timestampToTemp(new Date(), '%Y-%M-%D %h:%m:%s') })); // 进行加密
+            return data;
+        },
+        // 获取RSA公钥
+        async getRSAPublicKey() {
+            const res = await api.common.getRSAPublicKey();
+            if (res.code !== 200) {
+                this.$message.error(res.msg);
+                return;
+            }
+            localStorage.setItem('publicKey', res.data);
+            localStorage.setItem('putlicKeyGetTime', timestampToTemp(new Date(), '%Y-%M-%D %h:%m:%s'));
+            this.loadingSubmit(this.encryptionPwd(res.data));
+        },
+        // 登录
+        async loadingSubmit(pwd) {
+            const res = await api.common.login(this.loginForm.userName, pwd);
+            this.loading = false;
+            if (res.code !== 200) {
+                this.$message.error(res.msg);
+                return;
+            }
+            localStorage.setItem('BLUE_FEATHER_SAVEPWD', this.savePassword);
+            localStorage.setItem('BLUE_FEATHER_USERNAME', this.savePassword ? this.loginForm.userName : '');
+            localStorage.setItem('BLUE_FEATHER_PASSWORD', this.savePassword ? this.loginForm.password : '');
+            this.$store.commit('saveUserInfo', res.data);
+            this.$router.push('/index');
         }
     }
 };

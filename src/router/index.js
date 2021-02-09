@@ -3,6 +3,9 @@ import VueRouter from 'vue-router';
 import Login from '../views/Login.vue';
 import Template from '../components/Template/Template.vue';
 import Index from '../views/Index.vue';
+
+import User from '../views/system/User.vue';
+
 import CWCategory from '../views/finance/CWCategory.vue';
 import CWRecord from '../views/finance/CWRecord.vue';
 import CWtotalAssets from '../views/finance/CWtotalAssets.vue';
@@ -30,6 +33,18 @@ const routes = [
                 name: 'index',
                 title: '首页',
                 component: Index
+            }
+        ]
+    },
+    {
+        path: '/',
+        component: Template,
+        children: [
+            {
+                path: '/user',
+                name: 'user',
+                title: '用户管理',
+                component: User
             }
         ]
     },

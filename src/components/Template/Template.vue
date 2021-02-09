@@ -55,7 +55,7 @@ export default {
     left: 200px;
     right: 0;
     bottom: 0;
-    background-color: #efefef;
+    background-color: #f5f5f5;
 }
 
 .content-collapse {

@@ -10,10 +10,10 @@ const api = {
         'item.itemID': iId
     }),
     // 创建财务记录
-    createRecord: (categoryID, amount, dissipate) => axios.post('/api/cw/record/createRecord', {
-        pageNum: categoryID,
-        limit: amount,
-        checkMonth: dissipate
+    createCWRecord: (dissipate, amount, categoryID) => axios.post('/api/cw/record/createRecord', {
+        dissipate: dissipate,
+        amount: amount,
+        categoryID: categoryID
     })
 };
 export default api;
