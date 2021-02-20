@@ -1,7 +1,7 @@
 <template>
     <div class="table-content" v-loading="loading">
         <div class="table-box grid-Box">
-            <div v-for="item of pinList" :key="item.categoryID" class="pin pin-initial" :class="item.type === 1?'pin-red': item.type === 2?'pin-green':'pin-blue'" :ref="'pin-' + item.categoryID">
+            <div v-for="item of pinList" :key="item.categoryID" class="pin pin-initial" :class="item.type === 0?'pin-red': 'pin-green'" :ref="'pin-' + item.categoryID">
                 <div class="pin-title p-relative">
                     <span class="p-relative">
                         {{item.categoryName}}
@@ -10,7 +10,7 @@
                     <i class="el-icon-delete p-right" style="right:5px" @click="parentClose(item)"></i>
                 </div>
                 <div class="pin-nav-list">
-                    <el-tag v-for="child of item.children" :key="child.categoryID" :type="item.type === 1?'danger': item.type === 2?'success':''" closable class="pointer"
+                    <el-tag v-for="child of item.children" :key="child.categoryID" :type="item.type === 0?'danger': 'success'" closable class="pointer"
                         @close="childrenClose(child)" @click="parameter={type: 'edit',category: child}">{{child.categoryName}}</el-tag>
                     <div class="pin-add" @click="parameter = { type: 'childrenAdd', parent: item }"><i class="el-icon-plus"></i></div>
                 </div>
@@ -23,13 +23,14 @@
                 </div>
             </div>
         </div>
-        <CWCategoryEdit :parameter="parameter" @confirm="getAllCategory"></CWCategoryEdit>
+        <CWCategoryEdit :parameter="parameter" @confirm="refreshTree"></CWCategoryEdit>
     </div>
 </template>
 
 <script>
 import api from '@/api';
 import CWCategoryEdit from '@/components/finance/CWCategoryEdit.vue';
+import method from '@/method';
 export default {
     name: 'cwrecord',
     components: {
@@ -45,51 +46,24 @@ export default {
         };
     },
     mounted() {
-        this.getAllCategory();
+        this.refreshTree();
         window.addEventListener('resize', this.onResize);
     },
     destroyed() {
         window.removeEventListener('resize', this.onResize);
     },
     methods: {
-        // 获取所有收支项
-        async getAllCategory() {
+        // 刷新收支项树
+        refreshTree() {
             this.loading = true;
             this.isLoading = false;
-            this.pinList = [];
-            const res = await api.cwCategory.getAllCategory();
-            if (res.code !== 200) {
-                this.$message({ type: 'error', message: res.msg });
-                return;
-            }
-            let parentMap = new Map();
-            for (let item of res.data) {
-                if (item.parentID === 0) {
-                    item.children = [];
-                    if (parentMap.has(item.categoryID)) {
-                        continue;
-                    }
-                    parentMap.set(item.categoryID, item);
-                    continue;
-                }
-                if (parentMap.has(item.parentID)) {
-                    let parent = parentMap.get(item.parentID);
-                    parent.children.push(item);
-                    parentMap.set(item.parentID, parent);
-                    continue;
-                }
-                let parent = item.parent;
-                parent.children = [item];
-                parentMap.set(item.parentID, parent);
-            }
-
-            parentMap.forEach(val => {
-                this.pinList.push(val);
+            method.cw.getAllCategory().then((val) => {
+                this.pinList = val;
+                this.isLoading = true;
+                setTimeout(() => {
+                    this.waterfallFlowLayout();
+                }, 300);
             });
-            this.isLoading = true;
-            setTimeout(() => {
-                this.waterfallFlowLayout();
-            }, 100);
         },
         // 形成瀑布流
         waterfallFlowLayout() {
@@ -105,14 +79,15 @@ export default {
                     continue;
                 }
                 const el = this.$refs[key][0] ? this.$refs[key][0] : this.$refs[key];
-                console.log(key);
                 el.className = el.className.replace('pin-initial', 'pin-waterfall');
                 const appendIndex = this.getMinimumColumn(columnHeight);
                 el.style.top = columnHeight[appendIndex] + 'px';
                 el.style.left = (leftNum * appendIndex) + '%';
                 columnHeight[appendIndex] += el.getBoundingClientRect().height;
             }
-            this.loading = false;
+            setTimeout(() => {
+                this.loading = false;
+            }, 300);
         },
         // 获取最短的那一列
         getMinimumColumn(array) {
@@ -129,10 +104,7 @@ export default {
         },
         // 页面变化时判断瀑布流是否改变列数
         onResize() {
-            const num = document.body.offsetWidth < 768 ? 2 : document.body.offsetWidth < 992 ? 3 : document.body.offsetWidth < 1200 ? 4 : document.body.offsetWidth < 1920 ? 5 : 6;
-            if (this.columnNum !== num) {
-                this.waterfallFlowLayout();
-            }
+            this.waterfallFlowLayout();
         },
         parentClose(val) {
             this.$confirm('此操作将删除该主项 ' + val.categoryName + ' 及其所有子项, 是否继续?', '提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }).then(() => {
@@ -152,7 +124,7 @@ export default {
                 this.$message({ type: 'error', message: res.msg });
                 return;
             }
-            this.getAllCategory();
+            this.refreshTree();
         }
     }
 };
@@ -222,15 +194,6 @@ export default {
     .pin-add {
         border-color: #F56C6C;
         color: #F56C6C;
-    }
-}
-.pin-blue {
-    .pin-title {
-        background-color: #3096FF;
-    }
-    .pin-add {
-        border-color: #3096FF;
-        color: #3096FF;
     }
 }
 .pin-green {

@@ -11,3 +11,12 @@ export function timestampToTemp(timestamp, Template = '%Y-%M-%D %h:%m:%s') { // 
     const s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
     return Template.replace('%Y', Y).replace('%M', M).replace('%D', D).replace('%h', h).replace('%m', m).replace('%s', s);
 }
+
+export function thousandSeparator(num) {
+    return num && (num
+        .toString().indexOf('.') !== -1 ? num.toString().replace(/(\d)(?=(\d{3})+\.)/g, function($1, $2) {
+            return $2 + ',';
+        }) : num.toString().replace(/(\d)(?=(\d{3})+\b)/g, function($1, $2) {
+            return $2 + ',';
+        }));
+}

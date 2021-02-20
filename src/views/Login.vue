@@ -24,7 +24,7 @@
 
 <script>
 import api from '@/api';
-import { timestampToTemp } from '@/assets/js/method';
+import { timestampToTemp } from '@/assets/js/common';
 import JSEncrypt from 'jsencrypt';
 export default {
     name: 'Login',

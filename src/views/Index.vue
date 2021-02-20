@@ -5,10 +5,12 @@
 </template>
 
 <script>
+import api from '@/api';
 export default {
     name: 'Index',
     mounted() {
-        console.log(123);
+        api.cwUserFund.updateFundNAV();
+        api.cwFund.updateFund();
     }
 };
 </script>

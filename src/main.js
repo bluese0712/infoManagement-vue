@@ -4,6 +4,7 @@ import router from './router';
 import store from './store';
 
 import '@/assets/css/global.scss';
+import '@/assets/icon/iconfont.css';
 
 import {
     Pagination,
@@ -51,7 +52,7 @@ import {
     Row,
     Col,
     // Upload,
-    // Progress,
+    Progress,
     // Spinner,
     // Badge,
     // Card,
@@ -131,7 +132,7 @@ Vue.use(Tag);
 Vue.use(Row);
 Vue.use(Col);
 // Vue.use(Upload);
-// Vue.use(Progress);
+Vue.use(Progress);
 // Vue.use(Spinner);
 // Vue.use(Badge);
 // Vue.use(Card);

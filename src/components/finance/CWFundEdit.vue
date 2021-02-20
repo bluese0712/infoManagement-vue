@@ -22,12 +22,19 @@
                     </el-col>
                     <el-col :span="12">
                         <el-form-item label="确购时间" prop="confirmationTime">
-                            <el-date-picker v-model="dialogForm.confirmationTime" type="date" placeholder="选择日期"></el-date-picker>
+                            <el-date-picker v-model="dialogForm.confirmationTime" type="date" style="width:100%" placeholder="选择日期"></el-date-picker>
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="购买份额" prop="shares">
-                            <el-input v-model="dialogForm.shares" @change="numberInput($event, 'shares', true)" @input="numberInput($event, 'shares')"></el-input>
+                        <el-form-item label="购买金额" prop="amount">
+                            <el-input v-model="dialogForm.amount" @change="numberInput($event, 'amount', true)" @input="numberInput($event, 'amount')"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="购买费率" prop="bitRate">
+                            <el-input v-model="dialogForm.bitRate" @change="numberInput($event, 'bitRate', true)" @input="numberInput($event, 'bitRate')">
+                                <template slot="append">%</template>
+                            </el-input>
                         </el-form-item>
                     </el-col>
                     <el-col :span="24" v-if="type==='add'">
@@ -89,6 +96,7 @@
                 <el-col :span="4" class="show-label">确定份额：</el-col><el-col :span="20" class="show-label" v-html="confirmForm.bidShare"></el-col>
                 <el-col :span="4" class="show-label">确定时间：</el-col><el-col :span="20" class="show-label" v-html="confirmForm.bitTime"></el-col>
                 <el-col :span="4" class="show-label">购买金额：</el-col><el-col :span="20" class="show-label" v-html="confirmForm.purchaseAmount"></el-col>
+                <el-col :span="4" class="show-label">购买费用：</el-col><el-col :span="20" class="show-label" v-html="confirmForm.additionalCosts"></el-col>
                 <el-col :span="24" class="show-label" v-if="type==='add'">
                     <el-divider content-position="left" style="margin: 12px 0;color: red">赎回费率</el-divider>
                 </el-col>
@@ -112,7 +120,7 @@
 
 <script>
 import api from '@/api';
-import { timestampToTemp } from '@/assets/js/method';
+import { timestampToTemp } from '@/assets/js/common';
 export default {
     name: 'cwrecordedit',
     props: {
@@ -125,10 +133,10 @@ export default {
             if (val.type === 'add') {
                 return;
             }
-            this.dialogForm.fundID = val.fund.fund.fundID;
-            this.confirmForm.userFundID = val.fund.userFundID;
-            this.confirmForm.fundName = val.fund.fund.fundName;
-            this.confirmForm.fundCode = val.fund.fund.fundCode;
+            this.dialogForm.fundID = val.userFund.fund.fundID;
+            this.confirmForm.userFundID = val.userFund.userFundID;
+            this.confirmForm.fundName = val.userFund.fund.fundName;
+            this.confirmForm.fundCode = val.userFund.fund.fundCode;
         }
     },
     data() {
@@ -141,7 +149,8 @@ export default {
             dialogForm: {
                 fundID: '',
                 confirmationTime: '',
-                shares: ''
+                amount: '',
+                bitRate: '0.15'
             },
             confirmForm: {
                 userFundID: '',
@@ -156,7 +165,8 @@ export default {
             formRules: {
                 fundID: [{ required: true, message: '请选择基金', trigger: 'blur' }],
                 confirmationTime: [{ required: true, message: '请选择确购时间', trigger: 'blur' }],
-                shares: [{ required: true, message: '请填写购买份额', trigger: 'blur' }]
+                amount: [{ required: true, message: '请填写购买金额', trigger: 'blur' }],
+                bitRate: [{ required: true, message: '请填写购买费率', trigger: 'blur' }]
             },
             rateForm: {
                 minDays: '0',
@@ -196,14 +206,30 @@ export default {
                     this.rateForm.rate = this.rateForm.rate.split('.')[0] + '.' + this.rateForm.rate.split('.')[1];
                 }
                 break;
-            case 'shares':
-                this.dialogForm.shares = this.dialogForm.shares.replace(/[^\d.]/g, '');
-                if (this.dialogForm.shares.split('.').length > 2) {
-                    this.dialogForm.shares = this.dialogForm.shares.split('.')[0] + '.' + this.dialogForm.shares.split('.')[1];
+            case 'amount':
+                this.dialogForm.amount = this.dialogForm.amount.replace(/[^\d.]/g, '');
+                if (this.dialogForm.amount.split('.').length > 2) {
+                    this.dialogForm.amount = this.dialogForm.amount.split('.')[0] + '.' + this.dialogForm.amount.split('.')[1];
                 }
                 if (isEnd) {
-                    this.dialogForm.shares = parseFloat(this.dialogForm.shares).toString();
+                    this.dialogForm.amount = parseFloat(this.dialogForm.amount).toString();
                 }
+                break;
+            case 'bitRate':
+                this.dialogForm.bitRate = val.replace(/[^\d.]/g, '');
+                if (this.dialogForm.bitRate[0] === '.') {
+                    this.dialogForm.bitRate = '0' + this.dialogForm.bitRate;
+                }
+                if (isEnd) {
+                    if (this.dialogForm.bitRate[this.dialogForm.bitRate.length - 1] === '.') {
+                        this.dialogForm.bitRate = this.dialogForm.bitRate + '00';
+                    }
+                    this.dialogForm.bitRate = parseFloat(this.dialogForm.bitRate).toFixed(2);
+                }
+                if (this.dialogForm.bitRate.split('.').length > 2) {
+                    this.dialogForm.bitRate = this.dialogForm.bitRate.split('.')[0] + '.' + this.dialogForm.bitRate.split('.')[1];
+                }
+                break;
             }
         },
         // 添加赎回费率规则
@@ -272,18 +298,21 @@ export default {
                 }
             }
             this.confirmForm.bidNAV = res.data.DWJZ;
-            this.confirmForm.bidShare = this.dialogForm.shares;
+            this.confirmForm.purchaseAmount = this.dialogForm.amount;
+            this.confirmForm.additionalCosts = parseFloat((parseFloat(this.dialogForm.amount) * parseFloat(this.dialogForm.bitRate)) / 100).toFixed(2);
+            this.confirmForm.bidShare = parseFloat((this.dialogForm.amount - this.confirmForm.additionalCosts) / res.data.DWJZ).toFixed(2);
             this.confirmForm.bitTime = timestampToTemp(this.dialogForm.confirmationTime, '%Y-%M-%D');
-            this.confirmForm.purchaseAmount = parseFloat(parseFloat(res.data.DWJZ) * parseFloat(this.dialogForm.shares)).toFixed(2);
             this.confirmDialogVisible = true;
         },
         // 添加基金购买记录和赎回规则
         async addUserFundAndRedemptionRules() {
             this.confirmLoading = true;
-            const res = await api.cwFund.addUserFundAndRedemptionRules(this.confirmForm.fundID, this.confirmForm.bitTime + ' 12:00:00', this.confirmForm.bidNAV, this.confirmForm.bidShare, JSON.stringify(this.rateArray));
+            const res = await api.cwUserFund.addUserFundAndRedemptionRules(this.confirmForm.fundID, this.confirmForm.bitTime + ' 12:00:00', this.confirmForm.bidNAV, this.confirmForm.bidShare,
+                this.confirmForm.purchaseAmount, this.confirmForm.additionalCosts, this.dialogForm.bitRate, JSON.stringify(this.rateArray));
             this.confirmLoading = false;
             if (res.code !== 200) {
                 this.$message({ type: 'error', message: res.msg });
+                return;
             }
             this.$message({ type: 'success', message: '添加成功' });
             this.confirmDialogVisible = false;
@@ -293,10 +322,12 @@ export default {
         // 追加购买基金
         async appendUserFund() {
             this.confirmLoading = true;
-            const res = await api.cwFund.appendUserFund(this.confirmForm.userFundID, this.confirmForm.bitTime + ' 12:00:00', this.confirmForm.bidNAV, this.confirmForm.bidShare);
+            const res = await api.cwUserFund.appendUserFund(this.confirmForm.userFundID, this.confirmForm.bitTime + ' 12:00:00', this.confirmForm.bidNAV, this.confirmForm.bidShare,
+                this.confirmForm.purchaseAmount, this.confirmForm.additionalCosts);
             this.confirmLoading = false;
             if (res.code !== 200) {
                 this.$message({ type: 'error', message: res.msg });
+                return;
             }
             this.$message({ type: 'success', message: '添加成功' });
             this.confirmDialogVisible = false;
@@ -329,7 +360,8 @@ export default {
             this.dialogForm = {
                 fundID: '',
                 confirmationTime: '',
-                shares: ''
+                shares: '',
+                bitRate: '0.15'
             };
             this.rateArray = [];
             this.options = [];

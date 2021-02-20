@@ -19,7 +19,6 @@
                     <el-checkbox-group v-model="categoryType">
                         <el-checkbox label="收入" @change="typeChange($event, 'income')"></el-checkbox>
                         <el-checkbox label="支出" @change="typeChange($event, 'pay')"></el-checkbox>
-                        <el-checkbox label="其他" @change="typeChange($event, 'other')"></el-checkbox>
                     </el-checkbox-group>
                 </el-col>
                 <el-col :span="24" class="text-right mt-10">
@@ -90,9 +89,6 @@ export default {
             case 'pay':
                 this.categoryType = ['支出'];
                 break;
-            case 'other':
-                this.categoryType = ['其他'];
-                break;
             }
         },
         // 创建确认
@@ -105,7 +101,7 @@ export default {
         },
         // 创建收支项
         async createCWCategory() {
-            const type = this.type === 'childrenAdd' ? null : this.categoryType[0] === '收入' ? 1 : this.categoryType[0] === '支出' ? 2 : 0;
+            const type = this.type === 'childrenAdd' ? null : this.categoryType[0] === '收入' ? 1 : 0;
             const res = await api.cwCategory.createCWCategory(this.parent.categoryID, this.categoryName, type);
             this.createLoading = false;
             if (res.code !== 200) {
